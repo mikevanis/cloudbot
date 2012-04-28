@@ -75,7 +75,7 @@ void loop() {
   // ------- EVERY 500 MICROSECONDS -------
   if((unsigned long)(micros() - previous_timer) >= 500) {
     previous_timer = micros();
-
+/*
     // Smoothing];
     for(int i=0; i<2; i++) {
       if(stepsRemaining[i] != prevSteps[i]) {
@@ -87,7 +87,7 @@ void loop() {
         }
       }
       prevSteps[i] = stepsRemaining[i];
-    }
+    }*/
 
     // Run motors
     if(stepsRemaining[0] > 0) {
