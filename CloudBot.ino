@@ -7,6 +7,7 @@
 int numOfSteps;
 int stepsRemaining;
 boolean antiClockwise = false;
+boolean microStepping = false;
 int minSpeed;
 int maxSpeed;
 int currentSpeed;
@@ -43,7 +44,15 @@ void loop() {
 
     // Run motor
     if(stepsRemaining > 0) {
-      if(stepsRemaining > numOfSteps/2) {
+
+      // Is it time to microstep yet?
+      if(stepsRemaining == numOfSteps/2 && !microstepping) {
+        stepsRemaining *= 8;
+        digitalWrite(MS11, MS1_MODE(8));
+        digitalWrite(MS21, MS2_MODE(8));
+        microstepping = true;
+      }
+      else if(stepsRemaining > numOfSteps/2) {
         if((timer+1) % maxSpeed == 0) {
           digitalWrite(STEP1, LOW);
           digitalWrite(STEP1, HIGH);
@@ -51,7 +60,7 @@ void loop() {
         }
       }
       else {
-        if((timer+1) % currentSpeed == 0) {
+        if((timer+1) % (currentSpeed/8) == 0) {
           digitalWrite(STEP1, LOW);
           digitalWrite(STEP1, HIGH);
           stepsRemaining--;
@@ -62,6 +71,9 @@ void loop() {
     }
     else {
       digitalWrite(SLEEP1, LOW);
+      microstepping = false;
+      digitalWrite(MS11, MS1_MODE(8));
+      digitalWrite(MS21, MS2_MODE(8));
     }
     timer = (timer+1) % 100;
   }
@@ -120,5 +132,6 @@ void stepTo(int amt) {
     numOfSteps = stepsRemaining;
   }
 }
+
 
 
