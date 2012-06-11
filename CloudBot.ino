@@ -17,20 +17,49 @@
 
 #include <EasyStepper.h>
 
-EasyStepper x(2, 3, 5, 4, 6);
-EasyStepper y(7, 8, 10, 9, 11);
+EasyStepper x(2, 3, 5, 4, 6, 0);
+EasyStepper y(7, 8, 10, 9, 11, 1);
+
+char command[5];
+
+int currentPos;
 
 void setup() {
-  x.setMicrostepping(8);
-  y.setMicrostepping(8);
+  Serial.begin(115200);
+  x.setMicrostepping(1);
+  y.setMicrostepping(1);
   x.sleep(true);
-  y.sleep(true);
-  x.setMaxSpeed(30);
-  x.step(100);
-  y.step(100);
+  y.sleep(false);
+  x.setMaxSpeed(3);
+  y.setMaxSpeed(5);
+  zero();
+  x.setPosition(50);
+  x.stepTo(0);
 }
 
 void loop() {
+  if(Serial.available() > 0) {
+    int pos = Serial.parseInt();
+    x.stepTo(pos);
+  }
+  
   x.update();
-  y.update();
+}
+
+void zero() {
+  x.update();
+  int magneticAvg = 0;
+  for(int i=0; i<60; i++) {
+    magneticAvg += x.readEndStop();
+  }
+  //Serial.println(magneticAvg);
+  if(magneticAvg != 0) {
+    x.step(1);
+    zero();
+  }
+}
+
+void stepTo(int pos) {
+  int steps = (currentPos*-1) + pos;
+  x.step(steps);
 }
