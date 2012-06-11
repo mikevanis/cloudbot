@@ -26,7 +26,7 @@ int currentPos;
 
 void setup() {
   Serial.begin(115200);
-  x.setMicrostepping(1);
+  x.setMicrostepping(8);
   y.setMicrostepping(1);
   x.sleep(true);
   y.sleep(false);
@@ -38,9 +38,17 @@ void setup() {
 }
 
 void loop() {
-  if(Serial.available() > 0) {
-    int pos = Serial.parseInt();
-    x.stepTo(pos);
+  if(x.isMoving()==0) {
+    if(Serial.available() > 0) {
+      int pos = Serial.parseInt();
+      x.stepTo(pos);
+      Serial.print("pos = ");
+      Serial.println(pos);
+      Serial.flush();
+    }
+  }
+  else {
+    Serial.flush();
   }
   
   x.update();
